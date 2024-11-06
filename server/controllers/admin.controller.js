@@ -2,51 +2,51 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import prisma from "../db/prisma.js";
 
-export const register = async (req, res) => {
-  const { userId, password } = req.body;
+export const adminRegister = async (req, res) => {
+  const { adminId, password } = req.body;
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     console.log(hashedPassword);
 
-    const newUser = await prisma.user.create({
+    const newAdmin = await prisma.admin.create({
       data: {
-        userId,
+        adminId,
         password: hashedPassword,
       },
     });
-    console.log(newUser);
+    console.log(newAdmin);
 
-    res.status(201).json({ message: "User created successfully" });
+    res.status(201).json({ message: "Admin created successfully" });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: "Failed to create new user" });
+    res.status(500).json({ message: "Failed to create new Admin" });
   }
 };
 
-export const login = async (req, res) => {
-  const { userId, password } = req.body;
+export const adminLogin = async (req, res) => {
+  const { adminId, password } = req.body;
 
   try {
-    //check user exist
-    const user = await prisma.user.findUnique({
-      where: { userId },
+    //check admin exist
+    const admin = await prisma.admin.findUnique({
+      where: { adminId },
     });
 
-    if (!user) return res.status(401).json({ message: "User not found" });
+    if (!admin) return res.status(401).json({ message: "Admin not found" });
 
-    //check user password valid
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    //check admin password valid
+    const isPasswordValid = await bcrypt.compare(password, admin.password);
 
     if (!isPasswordValid) return res.status(401).json({ menubar: "wrong password" });
 
     //authentic
 
-    const age = 1000 * 60 * 30; //30 minute
+    const age = 1000 * 60 * 60; //1h
 
     const token = jwt.sign(
       {
-        id: user.id,
-        isUser: true,
+        id: admin.id,
+        isAdmin: true,
       },
       process.env.JWT_SECRETKEY,
       { expiresIn: age }
@@ -63,6 +63,6 @@ export const login = async (req, res) => {
     console.log(err);
   }
 };
-export const logout = (req, res) => {
+export const adminLogout = (req, res) => {
   res.clearCookie("testauth").status(200).json({ message: "logouted successfully" });
 };
