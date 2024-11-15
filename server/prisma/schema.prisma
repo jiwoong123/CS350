@@ -26,3 +26,21 @@ model Admin {
   password  String
   createdAt DateTime @default(now())
 }
+
+model equipments {
+  serialNumber        String          @id @default(auto()) @map("_id") @db.ObjectId
+  name                String          @unique
+  description         String
+  initialAverageUsage Int
+  gymEquipments       gymEquipments[]
+}
+
+model gymEquipments {
+  id                     String     @id @default(auto()) @map("_id") @db.ObjectId
+  equipment              equipments @relation(fields: [equipmentsSerialNumber], references: [serialNumber])
+  averageUsageTime       Int
+  location               String
+  recentUsage            Int?
+  installedAt            DateTime   @default(now())
+  equipmentsSerialNumber String     @db.ObjectId
+}

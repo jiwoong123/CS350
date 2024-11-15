@@ -26,5 +26,4 @@ export const AdminLoggedIn = async (req, res, next) => {
     req.adminId = payload.id;
     next();
   });
-  res.status(400).json({ message: "wrong" });
 };

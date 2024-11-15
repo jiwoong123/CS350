@@ -15,6 +15,7 @@
     "cookie-parser": "^1.4.7",
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",
-    "prisma": "^5.22.0"
+    "prisma": "^5.22.0",
+    "queue": "^7.0.0"
   }
 }
