@@ -1,5 +1,5 @@
 import express from "express";
-import { gymGoerLoggedIn, AdminLoggedIn } from "../controller/varify.controller.js";
+import { gymGoerLoggedIn, AdminLoggedIn } from "../middleware/varify.token.middleware.js";
 
 const router = express.Router();
 
