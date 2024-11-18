@@ -1,8 +1,7 @@
 import prisma from "../prisma/prisma.js";
 
 class Equipment {
-  constructor(id, name, description, averageUsageTime, location, recentUsage) {
-    this.id = id;
+  constructor(name, description, averageUsageTime, location, recentUsage) {
     this.name = name;
     this.description = description;
     this.averageUsageTime = averageUsageTime;
@@ -32,14 +31,19 @@ class GymEquipments {
 
   async initializeEquipment() {
     try {
-      const gymEquipments = await prisma.gymEquipments.findMany({
-        include: { information: true },
+      console.log("start");
+      const gymEquipments = await prisma.gymequipments.findMany({
+        include: { equipmentInfo: true },
       });
-
+      console.log(gymEquipments);
+      console.log("end");
       gymEquipments.forEach((gymEquipment) => {
-        const equipInfo = gymEquipment.information;
+        const equipInfo = gymEquipment.equipmentInfo;
+        if (!equipInfo) {
+          throw new Error("Invalid equipment information or missing serial number.");
+        }
+        console.log(gymEquipment.id);
         const equipmentInstance = new Equipment(
-          equipInfo.serialNumber,
           equipInfo.name,
           equipInfo.description,
           gymEquipment.averageUsageTime,
@@ -47,13 +51,12 @@ class GymEquipments {
           gymEquipment.recentUsage
         );
 
-        // Store equipment instance in the list with a unique ID
-        this.equipmentList[equipInfo.serialNumber] = equipmentInstance;
+        this.equipmentList[gymEquipment.id] = equipmentInstance;
       });
 
-      console.log("Equipments initialized:", this.equipmentList);
-    } catch (error) {
-      console.error("Error initializing equipment:", error);
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
     }
   }
 
@@ -61,8 +64,12 @@ class GymEquipments {
     return this.equipmentList[id] || null;
   }
 
+  reserveEquipment(equipmentId, userId) {
+    this.equipmentList[equipmentId].addToQueue(userId);
+  }
+
   getAllEquipments() {
-    return Object.values(this.equipmentList);
+    return this.equipmentList;
   }
 }
 

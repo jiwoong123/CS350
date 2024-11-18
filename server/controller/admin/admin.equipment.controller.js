@@ -1,18 +1,22 @@
 import { gymEquipments } from "../../model/equipment.model.js";
+import prisma from "../../prisma/prisma.js";
 
 export const initialEquipment = async (req, res) => {
-  try {
-    gymEquipments.initializeEquipment();
-  } catch (err) {
-    console.log(err);
+  const result = await gymEquipments.initializeEquipment();
+
+  if (result.success) {
+    console.log("Equipment initialization completed successfully.");
+    res.status(200).json({ message: "initialized successful" });
+  } else {
+    console.error("Failed to initialize equipment:", result.error);
     res.status(200).json({ message: "failed to initaial equipments" });
   }
 };
 
-export const addEquipment = async (req, res) => {
+export const newEquipmentInfo = async (req, res) => {
   const { name, description, initialAverageUsage } = req.body;
   try {
-    const newEquipment = await prisma.equipments.create({
+    const newEquipment = await prisma.equipmentinfo.create({
       data: {
         name,
         description,
@@ -33,21 +37,20 @@ export const addEquipment = async (req, res) => {
 export const addEquipments = async (req, res) => {
   const { equipmentName, location } = req.body;
   try {
-    const equipment = await prisma.equipments.findUnique({
+    const equipment = await prisma.equipmentinfo.findUnique({
       where: { name: equipmentName },
     });
-
     if (!equipment) {
       return res.status(404).json({ message: "Equipment not found" });
     }
 
-    const newGymEquipment = await prisma.gymEquipments.create({
+    const newGymEquipment = await prisma.gymequipments.create({
       data: {
-        information: {
-          connect: [{ serialNumber: equipment.serialNumber }],
-        },
         averageUsageTime: equipment.initialAverageUsage,
         location,
+        equipmentInfo: {
+          connect: { id: equipment.id },
+        },
       },
     });
 

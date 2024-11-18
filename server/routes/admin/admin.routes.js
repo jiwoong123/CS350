@@ -1,7 +1,11 @@
 import express from "express";
-import { adminLogin, adminLogout, adminRegister } from "../controller/admin/admin.controller.js";
-import { AdminLoggedIn } from "../middleware/varify.token.middleware.js";
-import { addEquipment, addEquipments, initialEquipment } from "../controller/equipment.controller.js";
+import { adminLogin, adminLogout, adminRegister } from "../../controller/admin/admin.auth.controller.js";
+import { AdminLoggedIn } from "../../middleware/varify.token.middleware.js";
+import {
+  newEquipmentInfo,
+  addEquipments,
+  initialEquipment,
+} from "../../controller/admin/admin.equipment.controller.js";
 
 const router = express.Router();
 
@@ -12,7 +16,7 @@ router.get("/logout", adminLogout);
 
 //gymequipment
 router.get("/initial", AdminLoggedIn, initialEquipment);
-router.post("/addequipment", AdminLoggedIn, addEquipment);
+router.post("/addequipment", AdminLoggedIn, newEquipmentInfo);
 router.post("/addequipments", AdminLoggedIn, addEquipments);
 router.put("/modifyequipment", AdminLoggedIn);
 

@@ -27,20 +27,20 @@ model Admin {
   createdAt DateTime @default(now())
 }
 
-model equipments {
-  serialNumber        String          @id @default(auto()) @map("_id") @db.ObjectId
+model Equipmentinfo {
+  id                  String          @id @default(auto()) @map("_id") @db.ObjectId
   name                String          @unique
   description         String
   initialAverageUsage Int
-  gymEquipments       gymEquipments[]
+  gymEquipments       Gymequipments[]
 }
 
-model gymEquipments {
-  id                     String     @id @default(auto()) @map("_id") @db.ObjectId
-  equipment              equipments @relation(fields: [equipmentsSerialNumber], references: [serialNumber])
+model Gymequipments {
+  id                     String        @id @default(auto()) @map("_id") @db.ObjectId
   averageUsageTime       Int
   location               String
   recentUsage            Int?
-  installedAt            DateTime   @default(now())
-  equipmentsSerialNumber String     @db.ObjectId
+  installedAt            DateTime      @default(now())
+  equipmentInfo          Equipmentinfo @relation(fields: [equipmentsSerialNumber], references: [id])
+  equipmentsSerialNumber String        @db.ObjectId
 }

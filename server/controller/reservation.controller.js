@@ -1,22 +1,23 @@
 import { gymEquipments } from "../model/equipment.model.js";
 
 export const reserveEquipment = async (req, res) => {
-  const userId = req.userId; // 사용자 ID (인증 미들웨어에서 전달된다고 가정)
-  const { equipmentId } = req.body; // 요청에서 기구 ID 추출
+  const userId = req.userId;
+  const { equipmentId } = req.body;
 
   try {
-    const equipment = gymEquipments.getEquipmentById(equipmentId); // 기구 객체 검색
+    console.log(gymEquipments.getAllEquipments());
+    const equipment = gymEquipments.getEquipmentById(equipmentId);
     if (!equipment) {
-      return res.status(404).json({ message: "Equipment not found" }); // 기구가 없을 경우
+      return res.status(404).json({ message: "Equipment not found" });
     }
 
-    equipment.addToQueue(userId); // 대기열에 사용자 추가
+    equipment.addToQueue(userId);
     res.status(200).json({
       message: `User ${userId} added to ${equipment.name}'s queue`,
-      queue: equipment.getQueue(), // 현재 대기열 정보 반환
+      queue: equipment.getQueue(),
     });
   } catch (err) {
     console.error("Error reserving equipment:", err);
-    res.status(500).json({ message: "Failed to reserve the equipment" }); // 서버 에러
+    res.status(500).json({ message: "Failed to reserve the equipment" });
   }
 };
