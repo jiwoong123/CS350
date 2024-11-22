@@ -1,6 +1,6 @@
 import express from "express";
 import { gymGoerLoggedIn } from "../middleware/varify.token.middleware.js";
-import { reserveEquipment } from "../controller/reservation.controller.js";
+import { reserveEquipment, cancelReservation, inquireReservations } from "../controller/reservation.controller.js";
 
 const router = express.Router();
 

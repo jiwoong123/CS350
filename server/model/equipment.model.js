@@ -71,6 +71,21 @@ class GymEquipments {
   getAllEquipments() {
     return this.equipmentList;
   }
+
+  getReservationsByUser(userId) {
+    const reservations = [];
+    Object.entries(this.equipmentList).forEach(([id, equipment]) => {
+      if (equipment.queue.includes(userId)) {
+        reservations.push({
+          equipmentId: id,
+          name: equipment.name,
+          description: equipment.description,
+          location: equipment.location,
+        });
+      }
+    });
+    return reservations;
+  }
 }
 
 export const gymEquipments = new GymEquipments();
