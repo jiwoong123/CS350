@@ -19,6 +19,13 @@ class Equipment {
     if (index > -1) this.queue.splice(index, 1);
   }
 
+  Dequeue() {
+    if (this.queue.length > 0) {
+      return this.queue.shift();
+    }
+    return null;
+  }
+
   getQueue() {
     return this.queue;
   }
@@ -85,6 +92,13 @@ class GymEquipments {
       }
     });
     return reservations;
+  }
+
+  popUser(equipmentId) {
+    const userId = this.equipmentList[equipmentId].Dequeue();
+    if (!userId) return null;
+    console.log(this.equipmentList[equipmentId].getQueue());
+    return userId;
   }
 }
 
