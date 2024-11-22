@@ -20,6 +20,6 @@ router.post("/addequipment", AdminLoggedIn, newEquipmentInfo);
 router.post("/addequipments", AdminLoggedIn, addEquipments);
 router.put("/modifyequipment", AdminLoggedIn);
 
-//gymgoers
+//gymgoers manage
 
 export default router;
