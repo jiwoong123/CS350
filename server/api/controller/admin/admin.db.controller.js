@@ -1,4 +1,4 @@
-import prisma from "../../prisma/prisma.js";
+import prisma from "../../../prisma/prisma.js";
 
 export const newEquipmentInfo = async (req, res) => {
   const { name, description, initialAverageUsage } = req.body;

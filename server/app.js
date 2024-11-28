@@ -1,10 +1,10 @@
 import express from "express";
 import cookieParser from "cookie-parser";
-import authRoute from "./routes/auth.routes.js";
-import testRoute from "./routes/test.routes.js";
-import adminRoute from "./routes/admin/admin.routes.js";
-import reservationRoute from "./routes/reserve.routes.js";
-import usageRoute from "./routes/usage.routes.js";
+import authRoute from "./api/apiGateway/auth.routes.js";
+import testRoute from "./api/apiGateway/test.routes.js";
+import adminRoute from "./api/apiGateway/admin/admin.routes.js";
+import reservationRoute from "./api/apiGateway/reserve.routes.js";
+import usageRoute from "./api/apiGateway/usage.routes.js";
 
 const app = express();
 

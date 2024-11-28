@@ -1,4 +1,4 @@
-import { gymEquipments } from "../model/equipment.model.js";
+import { gymEquipments } from "../../model/equipment.model.js";
 
 export const getUsages = (req, res) => {
   const equipments = gymEquipments.getAllEquipments();

@@ -1,4 +1,4 @@
-import { gymEquipments } from "./equipment.model.js";
+import { gymEquipments } from "../model/equipment.model.js";
 
 process.on("message", (msg) => {
   console.log("Message from parent:", msg);

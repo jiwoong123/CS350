@@ -1,4 +1,4 @@
-import { gymEquipments } from "../model/equipment.model.js";
+import { gymEquipments } from "../../model/equipment.model.js";
 
 export const reserveEquipment = async (req, res) => {
   const userId = req.userId;
