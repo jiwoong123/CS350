@@ -7,6 +7,7 @@ class Equipment {
     this.averageUsageTime = averageUsageTime;
     this.location = location;
     this.recentUsage = recentUsage;
+    this.status = false;
     this.queue = []; // 대기열
   }
 
@@ -25,7 +26,9 @@ class Equipment {
     }
     return null;
   }
-
+  changeStatus(data) {
+    this.status = true;
+  }
   getQueue() {
     return this.queue;
   }
