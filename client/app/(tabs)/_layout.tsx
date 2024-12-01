@@ -3,10 +3,11 @@ import React from "react";
 import { Platform } from "react-native";
 
 import { HapticTab } from "@/components/HapticTab";
+import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { FontAwesome5, Fontisto, Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -15,7 +16,9 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarInactiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
+        // headerTitleAlign: "center",
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
@@ -28,24 +31,17 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="gym"
         options={{
-          title: "Gym",
-          tabBarIcon: ({ color }) => <FontAwesome5 size={24} name="dumbbell" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="reservation"
-        options={{
-          title: "reservation",
-          tabBarIcon: ({ color }) => <Fontisto size={24} name="history" color={color} />,
+          title: "gym",
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: "profile",
-          tabBarIcon: ({ color }) => <Ionicons size={24} name="person" color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons size={28} name="person" color={color} />,
         }}
       />
     </Tabs>

@@ -5,12 +5,15 @@ import testRoute from "./api/apiGateway/test.routes.js";
 import adminRoute from "./api/apiGateway/admin/admin.routes.js";
 import reservationRoute from "./api/apiGateway/reserve.routes.js";
 import usageRoute from "./api/apiGateway/usage.routes.js";
+import cors from "cors";
 
 const app = express();
 
 //libraries
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 
 //routes
 app.use("/api/auth", authRoute);

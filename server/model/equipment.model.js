@@ -7,7 +7,7 @@ class Equipment {
     this.averageUsageTime = averageUsageTime;
     this.location = location;
     this.recentUsage = recentUsage;
-    this.status = false;
+    this.status = false; //false: not in use, tue: in use
     this.queue = []; // 대기열
   }
 
@@ -26,8 +26,8 @@ class Equipment {
     }
     return null;
   }
-  changeStatus(data) {
-    this.status = true;
+  changeStatus(usage) {
+    this.status = usage;
   }
   getQueue() {
     return this.queue;
@@ -80,6 +80,10 @@ class GymEquipments {
 
   getAllEquipments() {
     return this.equipmentList;
+  }
+
+  changeUsage(equipmentId, state) {
+    this.equipmentList[equipmentId].changeStatus(state);
   }
 
   getReservationsByUser(userId) {

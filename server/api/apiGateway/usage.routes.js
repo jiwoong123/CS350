@@ -1,9 +1,10 @@
 import express from "express";
-import { getUsages } from "../controller/usage.controller.js";
+import { getUsage, getUsages } from "../controller/usage.controller.js";
 
 const router = express.Router();
 
 //router.get("/equipment-info",)
-router.get("/equipment-usage", getUsages);
+router.get("/equipment-usages", getUsages);
+router.get("/equipment-usage", getUsage);
 
 export default router;

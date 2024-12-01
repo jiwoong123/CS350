@@ -25,7 +25,7 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   const { userId, password } = req.body;
-
+  console.log(`login of ${userId}`);
   try {
     //check user exist
     const user = await prisma.user.findUnique({
@@ -37,7 +37,7 @@ export const login = async (req, res) => {
     //check user password valid
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
-    if (!isPasswordValid) return res.status(401).json({ menubar: "wrong password" });
+    if (!isPasswordValid) return res.status(401).json({ message: "wrong password" });
 
     //authentic
 
@@ -58,7 +58,7 @@ export const login = async (req, res) => {
         maxAge: age,
       })
       .status(200)
-      .json({ message: "Login successful" });
+      .json({ message: "Login successful", token });
   } catch (err) {
     console.log(err);
   }
