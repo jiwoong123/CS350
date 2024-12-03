@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ActivityIndicator, Alert } from "react-native";
+import { StyleSheet, Text, View, ActivityIndicator, Button, Alert } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Stack } from "expo-router";
 import { apiRequest } from "@/lib/apiRequest.jsx"; // apiRequest 가져오기
@@ -9,33 +9,41 @@ const EquipmentDetail = () => {
   const [equipment, setEquipment] = useState(null); // 장비 데이터
   const [isLoading, setIsLoading] = useState(true); // 로딩 상태
 
+  // 장비 세부 정보를 가져오는 함수
+  const fetchEquipmentDetail = async () => {
+    try {
+      setIsLoading(true); // 로딩 시작
+
+      // AsyncStorage에서 authToken 가져오기
+      const authToken = await AsyncStorage.getItem("authToken");
+
+      // 서버 요청
+      const response = await apiRequest.get(`/usage/${equipmentId}`, {
+        headers: {
+          Cookie: `testauth=${authToken}`, // 쿠키 포함
+        },
+      });
+
+      setEquipment(response.data); // 데이터 저장
+    } catch (error) {
+      console.error("Error fetching equipment details:", error);
+      Alert.alert("Error", "Failed to fetch equipment details. Please try again later.");
+    } finally {
+      setIsLoading(false); // 로딩 종료
+    }
+  };
+
+  // 페이지 로드 시 장비 세부 정보 가져오기
   useEffect(() => {
-    const fetchEquipmentDetail = async () => {
-      try {
-        setIsLoading(true);
-
-        // AsyncStorage에서 authToken 가져오기
-        const authToken = await AsyncStorage.getItem("authToken");
-
-        // 서버 요청
-        const response = await apiRequest.get(`/usage/${equipmentId}`, {
-          headers: {
-            Cookie: `testauth=${authToken}`, // 쿠키 포함
-          },
-        });
-
-        setEquipment(response.data); // 데이터 저장
-      } catch (error) {
-        console.error("Error fetching equipment details:", error);
-        Alert.alert("Error", "Failed to fetch equipment details. Please try again later.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchEquipmentDetail();
   }, [equipmentId]);
 
+  // 새로 고침 함수
+  const handleRefresh = () => {
+    fetchEquipmentDetail();
+  };
+
+  // 로딩 중일 때 표시할 화면
   if (isLoading) {
     return (
       <View style={styles.container}>
@@ -45,6 +53,7 @@ const EquipmentDetail = () => {
     );
   }
 
+  // 장비 데이터가 없을 때 표시할 화면
   if (!equipment) {
     return (
       <View style={styles.container}>
@@ -61,6 +70,8 @@ const EquipmentDetail = () => {
       <Text>Name: {equipment.name}</Text>
       <Text>Description: {equipment.description}</Text>
       <Text>Status: {equipment.status}</Text>
+
+      <Button title="Refresh" onPress={handleRefresh} color="#6200ea" />
     </View>
   );
 };
