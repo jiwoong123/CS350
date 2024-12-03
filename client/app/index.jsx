@@ -1,24 +1,56 @@
-import { Redirect } from "expo-router";
+import React, { useEffect } from "react";
+import { View, Text, Button, StyleSheet } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 
-const index = () => {
-  return <Redirect href="auth" />;
+const IndexPage = () => {
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = await AsyncStorage.getItem("authToken");
+      if (token) {
+        router.push("/(tabs)/gym"); // 이미 로그인 상태면 Gym 페이지로 이동
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  const handleLogin = () => {
+    router.push("/auth/login");
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Welcome to Gym Reservation App</Text>
+      <Text style={styles.subtitle}>Your go-to app for managing gym equipment reservations.</Text>
+
+      <Button title="Login" onPress={handleLogin} color="#6200ea" />
+    </View>
+  );
 };
 
-export default index;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
+    padding: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 30,
+    textAlign: "center",
+  },
+});
 
-// import { StyleSheet, Text, View } from "react-native";
-// import React from "react";
-// import { NavigationContainer } from "@react-navigation/native";
-// import { Stack } from "expo-router";
-// import LoginScreen from "./auth";
-// import GymScreen from "./(tabs)/gym";
-
-// const index = () => {
-//   return (
-
-//   );
-// };
-
-// export default index;
-
-// const styles = StyleSheet.create({});
+export default IndexPage;

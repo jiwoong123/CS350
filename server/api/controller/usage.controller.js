@@ -7,7 +7,8 @@ export const getUsages = (req, res) => {
 };
 
 export const getUsage = (req, res) => {
-  const { equipmentId } = req.body;
+  const equipmentId = req.params.id;
+  console.log(equipmentId);
   const equipment = gymEquipments.getEquipmentById(equipmentId);
   if (!equipment) {
     res.status(500).json({ message: "wrong equipment id" });

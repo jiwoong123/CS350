@@ -1,37 +1,63 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
-import { apiRequest, setCookie, storeData } from "@/lib/apiRequest.jsx";
+import { apiRequest, apiURL } from "@/lib/apiRequest.jsx";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+// import CookieManager from "@react-native-cookies/cookies";
 
-const LoginScreen = ({ navigation }) => {
+const LoginScreen = () => {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
 
+  // 이미 로그인된 경우를 처리
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const cookies = await AsyncStorage.getItem("authToken");
+        if (cookies) {
+          router.push("/(tabs)/gym"); // 로그인된 상태라면 이동
+        }
+      } catch (err) {
+        console.error("Error checking login status:", err);
+      }
+    };
+    checkLoginStatus();
+  }, []);
+
   const handleLogin = async () => {
-    setError(""); // 기존 오류 초기화
+    setError("");
     if (!userId || !password) {
       Alert.alert("Error", "Please enter both userId and password");
       return;
     }
 
-    setLoading(true); // 로딩 상태 활성화
+    setLoading(true);
 
     try {
-      // 서버에 로그인 요청
       const response = await apiRequest.post("/auth/login", { userId, password });
-      Alert.alert("Success", "You are now logged in");
-      const [cookie] = response.headers["set-cookie"];
-      setCookie(JSON.stringify(cookie));
-      await storeData("cookie", JSON.stringify(cookie));
 
-      router.push("/(tabs)/gym");
+      const token = response.data.token;
+      await AsyncStorage.setItem("authToken", token);
+
+      // const setCookieHeader = response.headers["set-cookie"];
+      // if (setCookieHeader) {
+      //   await CookieManager.set(apiURL, {
+      //     name: "authToken",
+      //     value: setCookieHeader,
+      //     domain: apiURL,
+      //     path: "/",
+      //     secure: true,
+      //     httpOnly: true,
+      //   });
+      // }
+
+      router.push("/(tabs)/gym"); // 성공 시 이동
     } catch (err) {
       console.error("Login error:", err);
-
-      setError(err.response.data.message);
+      setError(err.response?.data?.message || "An error occurred during login");
     } finally {
       setLoading(false); // 로딩 상태 해제
     }
@@ -68,6 +94,8 @@ const LoginScreen = ({ navigation }) => {
   );
 };
 
+export default LoginScreen;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -96,5 +124,3 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
-
-export default LoginScreen;
