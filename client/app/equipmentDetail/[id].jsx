@@ -1,17 +1,23 @@
-import { StyleSheet, Text, View, ActivityIndicator, Button, Alert } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, ActivityIndicator } from "react-native";
 import { Stack } from "expo-router";
-import { apiRequest } from "@/lib/apiRequest.jsx"; // apiRequest 가져오기
+import Feather from "@expo/vector-icons/Feather";
+import { apiRequest } from "@/lib/apiRequest";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import seatedLow from "@/assets/images/seatedlow.png";
+import chestPress from "@/assets/images/chestpress.png";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
-const EquipmentDetail = () => {
-  const equipmentId = "673b06315e6648bb4da2f441"; // 장비 ID
-  const [equipment, setEquipment] = useState(null); // 장비 데이터
-  const [isLoading, setIsLoading] = useState(true); // 로딩 상태
+const EquipmentInformation = () => {
+  const equipmentId = "673b06315e6648bb4da2f441";
+  const [equipment, setEquipment] = useState({});
+  const [recommendedEquipments, setRecommendedEquipments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // 장비 세부 정보를 가져오는 함수
-  const fetchEquipmentDetail = async () => {
+  const fetchEquipmentDetails = async () => {
+    setIsLoading(true);
     try {
+      // 서버 API 요청 (예제용 Mock 데이터 사용)
       setIsLoading(true); // 로딩 시작
 
       // AsyncStorage에서 authToken 가져오기
@@ -23,72 +29,234 @@ const EquipmentDetail = () => {
           Cookie: `testauth=${authToken}`, // 쿠키 포함
         },
       });
+      const equipmentData = {
+        name: "Lat Pull Down",
+        peopleWaiting: response.data.queue.length,
+        expectedAvailableTime: response.data.queue.length * 7,
+        target: "Latissimus dorsi",
+        status: response.data.queue.length ? true : response.data.status, // true: not available, false: available
+        tutorialVideo: true,
+      };
 
-      setEquipment(response.data); // 데이터 저장
+      const recommendedData = [
+        {
+          id: 1,
+          name: "Seated Low",
+          peopleUsing: 0,
+          expectedTime: "available now",
+          image: seatedLow,
+        },
+        {
+          id: 2,
+          name: "Converging Chest Press",
+          peopleUsing: 0,
+          expectedTime: "2min",
+          image: chestPress,
+        },
+      ];
+
+      setEquipment(equipmentData);
+      setRecommendedEquipments(recommendedData);
     } catch (error) {
       console.error("Error fetching equipment details:", error);
-      Alert.alert("Error", "Failed to fetch equipment details. Please try again later.");
     } finally {
-      setIsLoading(false); // 로딩 종료
+      setIsLoading(false);
     }
   };
 
-  // 페이지 로드 시 장비 세부 정보 가져오기
+  // 첫 로드 시 데이터 가져오기
   useEffect(() => {
-    fetchEquipmentDetail();
-  }, [equipmentId]);
+    fetchEquipmentDetails();
+  }, []);
 
-  // 새로 고침 함수
-  const handleRefresh = () => {
-    fetchEquipmentDetail();
+  // Availability 상태 텍스트로 변환
+  const getAvailabilityText = (status) => {
+    return status ? "Not Available" : "Available";
   };
 
-  // 로딩 중일 때 표시할 화면
   if (isLoading) {
     return (
-      <View style={styles.container}>
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#6200ea" />
-        <Text>Loading equipment details...</Text>
-      </View>
-    );
-  }
-
-  // 장비 데이터가 없을 때 표시할 화면
-  if (!equipment) {
-    return (
-      <View style={styles.container}>
-        <Text>No equipment details found.</Text>
+        <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Stack.Screen options={{ headerTitle: "Equipment Detail" }} />
-      <Text style={styles.title}>Equipment Details</Text>
-      <Text>ID: {equipmentId}</Text>
-      <Text>Name: {equipment.name}</Text>
-      <Text>Description: {equipment.description}</Text>
-      <Text>Status: {equipment.status}</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Stack.Screen options={{ headerTitle: "Equipment Information" }} />
 
-      <Button title="Refresh" onPress={handleRefresh} color="#6200ea" />
-    </View>
+      {/* 제목과 Refresh 버튼 */}
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>{equipment.name}</Text>
+        <TouchableOpacity style={styles.refreshButton} onPress={fetchEquipmentDetails}>
+          <Feather name="refresh-ccw" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
+
+      {/* 장비 정보 */}
+      <View style={styles.infoContainer}>
+        <Text style={styles.label}>People waiting</Text>
+        <Text style={styles.value}>{equipment.peopleWaiting}</Text>
+
+        <Text style={styles.label}>Expected available time</Text>
+        <Text style={styles.value}>{equipment.expectedAvailableTime}</Text>
+
+        <Text style={styles.label}>Recommended target muscle</Text>
+        <Text style={styles.value}>{equipment.target}</Text>
+
+        <Text style={styles.label}>Availability</Text>
+        <Text style={[styles.value, { color: equipment.status ? "red" : "green", fontWeight: "bold" }]}>
+          {getAvailabilityText(equipment.status)}
+        </Text>
+
+        {/* 튜토리얼 비디오 버튼 */}
+        {equipment.tutorialVideo && (
+          <View style={styles.videoContainer}>
+            <Text style={styles.label}>Tutorial Videos</Text>
+            <TouchableOpacity style={styles.videoButton}>
+              <FontAwesome6 name="youtube" size={24} color="red" />
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+
+      {/* 추천 장비 */}
+      <Text style={styles.subTitle}>Available equipments now</Text>
+      <View style={styles.recommendationContainer}>
+        {recommendedEquipments.map((item) => (
+          <View key={item.id} style={styles.recommendationCard}>
+            <Image source={item.image} style={styles.equipmentImage} />
+            <Text style={styles.equipmentName}>{item.name}</Text>
+            <Text style={styles.equipmentDetail}>
+              👥 {item.peopleUsing} | ⏱ {item.expectedTime}
+            </Text>
+          </View>
+        ))}
+      </View>
+
+      {/* 예약 버튼 */}
+      <TouchableOpacity style={styles.reserveButton}>
+        <Text style={styles.reserveButtonText}>Request Reservation (2/3)</Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 };
 
-export default EquipmentDetail;
+export default EquipmentInformation;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    flexGrow: 1,
     padding: 20,
     backgroundColor: "#f5f5f5",
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#666",
+  },
+  titleContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "bold",
+    color: "#333",
+  },
+  refreshButton: {
+    padding: 10,
+  },
+  infoContainer: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  label: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 5,
+  },
+  value: {
+    fontSize: 16,
     marginBottom: 15,
+  },
+  videoContainer: {
+    display: "flex",
+    flexDirection: "row", // 텍스트와 버튼을 가로로 정렬
+    alignItems: "center", // 세로 중앙 정렬
+    justifyContent: "flex-start",
+    marginTop: 10,
+  },
+  videoButton: {
+    marginLeft: 10, // 텍스트와 버튼 사이 간격
+    padding: 10,
+  },
+  videoText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  subTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  recommendationContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  recommendationCard: {
+    width: "48%",
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 10,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  equipmentImage: {
+    width: 80,
+    height: 80,
+    marginBottom: 10,
+  },
+  equipmentName: {
+    fontSize: 14,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  equipmentDetail: {
+    fontSize: 12,
+    color: "#666",
+  },
+  reserveButton: {
+    backgroundColor: "#6200ea",
+    padding: 15,
+    borderRadius: 5,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  reserveButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
