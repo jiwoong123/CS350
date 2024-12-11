@@ -1,15 +1,15 @@
 import React from "react";
-import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, Button, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ProfileScreen = () => {
   const router = useRouter();
-  const username = "John Doe"; 
+  const username = "John Doe";
   const userID = "John";
   const password = "••••";
-  const gymJoinDate = "2023-01-10"; 
+  const gymJoinDate = "2023-01-10";
 
   const handleLogout = async () => {
     try {
@@ -28,12 +28,7 @@ const ProfileScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Ionicons
-          name="person-circle"
-          size={40}
-          color="gray"
-          style={styles.profileIcon}
-        />
+        <Ionicons name="person-circle" size={40} color="gray" style={styles.profileIcon} />
         <Text style={styles.username}>{username}</Text>
         <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
           <Ionicons name="log-out" size={24} color="#ff6347" style={styles.logoutIcon} />
@@ -64,7 +59,7 @@ const ProfileScreen = () => {
         <Ionicons name="create" size={24} color="black" style={styles.optionIcon} />
         <Text style={styles.optionText}>Edit Profile</Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity style={styles.optionContainer}>
         <Ionicons name="globe" size={24} color="black" style={styles.optionIcon} />
         <Text style={styles.optionText}>Location: Daejeon, South Korea</Text>
@@ -115,10 +110,10 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 20,
     fontWeight: "bold",
-    flex: 1, 
+    flex: 1,
   },
   logoutButton: {
-    flexDirection: "row", 
+    flexDirection: "row",
     alignItems: "center",
     padding: 10,
   },

@@ -3,7 +3,7 @@ import { gymEquipments } from "../../model/equipment.model.js";
 export const reserveEquipment = async (req, res) => {
   const userId = req.userId;
   const { equipmentId } = req.body;
-
+  console.log(equipmentId);
   try {
     const equipment = gymEquipments.getEquipmentById(equipmentId);
     if (!equipment) {
@@ -12,6 +12,7 @@ export const reserveEquipment = async (req, res) => {
 
     equipment.addToQueue(userId);
     res.status(200).json({
+      success: true,
       message: `User ${userId} added to ${equipment.name}'s queue`,
       queue: equipment.getQueue(),
     });
@@ -46,16 +47,22 @@ export const cancelReservation = (req, res) => {
 
 export const inquireReservations = (req, res) => {
   const userId = req.userId;
-
+  console.log(userId);
   try {
     const reservations = gymEquipments.getReservationsByUser(userId);
 
     if (reservations.length === 0) {
-      return res.status(404).json({ message: "No reservations found for this user" });
+      console.log(1);
+      return res.status(200).json({ message: "No reservations found for this user", reservations: [] });
     }
+    const reserve = reservations.map((equipment) => {
+      const detail = gymEquipments.getEquipmentById(equipment.equipmentId);
+      return detail;
+    });
+    console.log(2);
     return res.status(200).json({
       message: "Reservations retrieved successfully",
-      reservations,
+      reservations: reserve,
     });
   } catch (err) {
     console.error(err);

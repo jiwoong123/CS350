@@ -16,7 +16,6 @@ const EquipmentInformation = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchEquipmentDetails = async () => {
-    setIsLoading(true);
     try {
       // 서버 API 요청 (예제용 Mock 데이터 사용)
       setIsLoading(true); // 로딩 시작
@@ -29,9 +28,9 @@ const EquipmentInformation = () => {
         headers: {
           Cookie: `testauth=${authToken}`, // 쿠키 포함
         },
-      }); 
+      });
       const equipmentData = {
-        name: "Lat Pull Down",
+        name: "Lat PullDown",
         peopleWaiting: response.data.queue.length,
         expectedAvailableTime: response.data.queue.length * 7,
         target: "Latissimus dorsi",
@@ -39,7 +38,7 @@ const EquipmentInformation = () => {
         tutorialVideo: true,
 
         // 서버 연결 안할 때 아래 꺼로
-        // name: "Lat Pull Down",
+        // name: "Lat PullDown",
         // peopleWaiting: 3,
         // expectedAvailableTime: 3 * 7,
         // target: "Latissimus dorsi",
@@ -146,7 +145,26 @@ const EquipmentInformation = () => {
       </View>
 
       {/* 예약 버튼 */}
-      <TouchableOpacity style={styles.reserveButton} onPress={() => router.push("/(tabs)/reservations")}>
+      <TouchableOpacity
+        style={styles.reserveButton}
+        onPress={async () => {
+          try {
+            const authToken = AsyncStorage.getItem("authtoken");
+            console.log(authToken);
+            const res = await apiRequest.post("/reserve/reserve", {
+              equipmentId: "673b06315e6648bb4da2f441",
+              headers: {
+                Cookie: `testauth = ${authToken}`,
+              },
+            });
+            console.log(res.data.message);
+            if (res.data.success) router.push("/(tabs)/reservations");
+            else router.push("/(tabs)/gym");
+          } catch (err) {
+            console.log("axios error", err);
+          }
+        }}
+      >
         <Text style={styles.reserveButtonText}>Request Reservation (2/3)</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -269,5 +287,3 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
-
-

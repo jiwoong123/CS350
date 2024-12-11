@@ -1,56 +1,96 @@
-import React from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; 
-
-const reservations = [
-  {
-    id: 1,
-    name: "Leg Press Machine",
-    peopleUsing: 2,
-    expectedTime: "10min",
-  },
-  {
-    id: 2,
-    name: "Treadmill",
-    peopleUsing: 1,
-    expectedTime: "5min",
-  },
-  {
-    id: 3,
-    name: "Lat Pull Down",
-    peopleUsing: 3,
-    expectedTime: "15min",
-  },
-];
+import React, { useEffect, useState, useCallback } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, FlatList, Alert, Image } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { apiRequest } from "@/lib/apiRequest";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
+import { useRouter } from "expo-router";
+import latpulldown from "@/assets/images/latpulldown.png";
 
 const ReservationScreen = () => {
+  const router = useRouter();
+  const [reservations, setReservations] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const navigation = useNavigation();
+
+  const fetchReservations = useCallback(async () => {
+    try {
+      const authToken = await AsyncStorage.getItem("authToken");
+      const response = await apiRequest.get("/reserve/inquire", {
+        headers: {
+          Cookie: `testauth=${authToken}`,
+        },
+      });
+
+      setReservations((prevReservations) => {
+        if (prevReservations.length > response.data.reservations.length) {
+          Alert.alert("Reservation Removed", "A reservation has been removed.");
+        }
+        return response.data.reservations;
+      });
+    } catch (err) {
+      console.error("Failed to fetch reservations:", err, err.response?.data || err.message);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchReservations();
+    const interval = setInterval(fetchReservations, 1000);
+    return () => clearInterval(interval);
+  }, [fetchReservations]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", fetchReservations);
+    return unsubscribe;
+  }, [navigation, fetchReservations]);
+
+  const handleRemoveReservation = async (id) => {
+    try {
+      await apiRequest.delete(`/reservations/${id}`);
+      setReservations((prevReservations) => prevReservations.filter((reservation) => reservation.id !== id));
+    } catch (error) {
+      console.error("Failed to remove reservation:", error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>
-          ({reservations.length}/3)
-        </Text>
+        <Text style={styles.headerText}>Your Reservations ({reservations.length}/3)</Text>
+        <TouchableOpacity style={styles.refreshButton} onPress={fetchReservations}>
+          <Ionicons name="refresh" size={24} color="#007AFF" />
+        </TouchableOpacity>
       </View>
 
-      <View style={styles.reservationList}>
-        {reservations.map((item) => (
-          <View key={item.id} style={styles.reservationCard}>
-            <View style={styles.reservationDetails}>
-              <Text style={styles.equipmentName}>{item.name}</Text>
-              <View style={styles.detailsContainer}>
-                <View style={styles.detailItem}>
-                  <Text style={styles.equipmentDetail}>
-                    👥 {item.peopleUsing} | ⏱ {item.expectedTime}
-                  </Text>
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#007AFF" />
+        </View>
+      ) : (
+        <FlatList
+          data={reservations}
+          keyExtractor={(item) => item.name.toString()}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => router.push("/equipmentDetail/123")}>
+              <View style={styles.reservationCard}>
+                <Image source={latpulldown} style={styles.reservationImage} />
+                <View style={styles.reservationDetails}>
+                  <Text style={styles.equipmentName}>{item.name}</Text>
+                  <View style={styles.detailsContainer}>
+                    <Text style={styles.equipmentDetail}>👥 {item.queue.length}</Text>
+                    <Text style={styles.equipmentDetail}>⏱ {item.queue.length * 7} mins</Text>
+                  </View>
                 </View>
+                <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveReservation(item.id)}>
+                  <Ionicons name="trash-outline" size={20} color="#FF3B30" />
+                </TouchableOpacity>
               </View>
-            </View>
-            <TouchableOpacity style={styles.removeButton}>
-              <Ionicons name="remove-circle-outline" size={15} color="#FF0000" />
             </TouchableOpacity>
-          </View>
-        ))}
-      </View>
+          )}
+          contentContainerStyle={styles.reservationList}
+          ListEmptyComponent={<Text style={styles.emptyMessage}>No reservations found.</Text>}
+        />
+      )}
     </View>
   );
 };
@@ -59,61 +99,77 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#F9FAFB",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   header: {
-    marginTop: 100,
+    marginTop: 50,
     marginBottom: 20,
-    alignItems: "flex-end",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   headerText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#1F2937",
+  },
+  refreshButton: {
+    padding: 5,
   },
   reservationList: {
-    flex: 1,
-    marginTop: 20,
+    marginTop: 10,
   },
   reservationCard: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FFFFFF",
     padding: 15,
-    borderRadius: 8,
-    marginBottom: 100, // 간격을 넓혔습니다.
+    borderRadius: 10,
+    marginBottom: 15,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 5,
+    shadowRadius: 4,
     elevation: 3,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  reservationImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 25,
+    marginRight: 15,
   },
   reservationDetails: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center", 
-    marginBottom: 18, 
+    flex: 1,
   },
   equipmentName: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
-    flex: 2,
+    fontWeight: "500",
+    color: "#111827",
   },
   detailsContainer: {
     flexDirection: "row",
-    justifyContent: "flex-end", 
+    gap: 10,
   },
-  detailItem: {
-    flexDirection: "row",
-    alignItems: "center", 
-  },
-  detailText: {
+  equipmentDetail: {
     fontSize: 14,
-    color: "#555",
+    color: "#6B7280",
   },
   removeButton: {
-    position: "absolute",
-    right: 10,
-    bottom: 10,
+    marginTop: 10,
+    alignSelf: "flex-end",
+  },
+  emptyMessage: {
+    textAlign: "center",
+    color: "#9CA3AF",
+    fontSize: 16,
+    marginTop: 50,
   },
 });
 

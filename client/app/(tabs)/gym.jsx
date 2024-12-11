@@ -57,13 +57,13 @@ const GymLayout = () => {
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <Link href="/gymsearch">
-          <IconSymbol size={28} name="house.fill" color="white"/>
+          <IconSymbol size={28} name="house.fill" color="white" />
         </Link>
         <Text style={styles.header}>Silloe Gym</Text>
         <Link href="/profile">
-          <Ionicons name="person" size={24} color="white"/>
+          <Ionicons name="person" size={24} color="white" />
         </Link>
-      </View> 
+      </View>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContainer} horizontal>
         <ScrollView contentContainerStyle={styles.gymContent}>
           <View style={[styles.gymContainer, { width: gymWidth, height: gymHeight }]}>
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
-    justifyContent: "space-between",
+    justifyContent: "space-around",
   },
   header: {
     fontSize: 24,

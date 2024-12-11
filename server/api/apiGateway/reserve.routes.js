@@ -5,7 +5,7 @@ import { reserveEquipment, cancelReservation, inquireReservations } from "../con
 const router = express.Router();
 
 router.post("/reserve", gymGoerLoggedIn, reserveEquipment);
-router.post("/cancel", gymGoerLoggedIn);
-router.post("/inquire", gymGoerLoggedIn);
+router.post("/cancel", gymGoerLoggedIn, cancelReservation);
+router.get("/inquire", gymGoerLoggedIn, inquireReservations);
 
 export default router;

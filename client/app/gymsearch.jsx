@@ -1,31 +1,75 @@
-import React from "react";
-import { View, Text, TextInput, StyleSheet, Image } from "react-native";
+import React, { useState } from "react";
+import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Modal, Button } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import searchMap from "@/assets/images/searchmap.png"; 
+import searchMap from "@/assets/images/searchmap.png";
+import { useRouter } from "expo-router";
 
 const GymSearchScreen = () => {
-  return (                          
+  const router = useRouter();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedGym, setSelectedGym] = useState(null);
+  const [searchInput, setSearchInput] = useState("");
+
+  const gyms = [
+    { id: 1, name: "Silloe Gym", description: "24/7 access with premium equipment." },
+    { id: 2, name: "Downtown Gym", description: "Convenient location with affordable rates." },
+    { id: 3, name: "High Peak Gym", description: "Advanced training facilities for athletes." },
+  ];
+
+  const handleMapClick = () => {
+    setSelectedGym(gyms[0]); // Example: Default selection when map is clicked
+    setModalVisible(true);
+  };
+
+  const handleSearchInput = (input) => {
+    setSearchInput(input);
+    const foundGym = gyms.find((gym) => gym.name.toLowerCase().includes(input.toLowerCase()));
+    if (foundGym) {
+      setSelectedGym(foundGym);
+      setModalVisible(true);
+    }
+  };
+
+  return (
     <View style={styles.container}>
       <Text style={styles.headerTitle}>Search for a Gym!</Text>
-      
+
       <View style={styles.searchContainer}>
         <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
         <TextInput
-            placeholder="Enter gym name"
-            placeholderTextColor="#888"
+          placeholder="Enter gym name"
+          placeholderTextColor="#888"
+          onSubmitEditing={(e) => handleSearchInput(e.nativeEvent.text)}
         />
       </View>
 
-      <View style={styles.mapContainer}>
-        <Image
-          source={
-              //   uri: "https://simg.pstatic.net/static.map/v2/map/staticmap.bin?caller=smarteditor&markers=color%3A0x11cc73%7Csize%3Amid%7Cpos%3A127.361606%2036.372481%7CviewSizeRatio%3A0.7%7Clabel%3Aa%7Ctype%3Aa&markers=color%3A0x11cc73%7Csize%3Amid%7Cpos%3A127.36293%2036.372146%7CviewSizeRatio%3A0.7%7Clabel%3Ab%7Ctype%3Aa&markers=color%3A0x11cc73%7Csize%3Amid%7Cpos%3A127.356895%2036.373003%7CviewSizeRatio%3A0.7%7Clabel%3Ac%7Ctype%3Aa&markers=color%3A0x11cc73%7Csize%3Amid%7Cpos%3A127.368404%2036.369561%7CviewSizeRatio%3A0.7%7Clabel%3Ad%7Ctype%3Aa&w=892&h=466&scale=2&dataversion=171.73",
-              searchMap
-              }
-          style={styles.mapImage}
-          resizeMode="cover"
-        />
-      </View>
+      <TouchableOpacity style={styles.mapContainer} onPress={handleMapClick}>
+        <Image source={searchMap} style={styles.mapImage} resizeMode="cover" />
+      </TouchableOpacity>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+              <Ionicons name="close" size={24} color="#000" />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>{selectedGym?.name || "Gym Details"}</Text>
+            <Text style={styles.modalDescription}>{selectedGym?.description || "No details available."}</Text>
+            <Button
+              title="Enter"
+              onPress={() => {
+                setModalVisible(false);
+                router.push("/(tabs)/gym");
+              }}
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -55,6 +99,9 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     backgroundColor: "#fff",
   },
+  searchIcon: {
+    marginRight: 10,
+  },
   mapContainer: {
     flex: 1,
     justifyContent: "center",
@@ -63,7 +110,36 @@ const styles = StyleSheet.create({
   },
   mapImage: {
     width: "100%",
-    height: "100%", 
+    height: "100%",
     borderRadius: 8,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "80%",
+    padding: 20,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    alignItems: "center",
+    position: "relative",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  modalDescription: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: "center",
   },
 });

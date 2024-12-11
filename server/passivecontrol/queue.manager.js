@@ -19,7 +19,6 @@ setInterval(() => {
 
     if (!prevEquipment) continue;
 
-    console.log(prevEquipment.status, currentEquipment.status);
     if (prevEquipment.status === true && currentEquipment.status === false) {
       console.log(`${equipmentId}`);
       gymEquipments.popUser(equipmentId);
