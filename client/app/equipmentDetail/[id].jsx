@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, ActivityIndicator } from "react-native";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import Feather from "@expo/vector-icons/Feather";
 import { apiRequest } from "@/lib/apiRequest";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -9,6 +9,7 @@ import chestPress from "@/assets/images/chestpress.png";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 const EquipmentInformation = () => {
+  const router = useRouter();
   const equipmentId = "673b06315e6648bb4da2f441";
   const [equipment, setEquipment] = useState({});
   const [recommendedEquipments, setRecommendedEquipments] = useState([]);
@@ -23,12 +24,12 @@ const EquipmentInformation = () => {
       // AsyncStorage에서 authToken 가져오기
       const authToken = await AsyncStorage.getItem("authToken");
 
-      // 서버 요청
+      // 서버 요청. 서버 연결 안할 때 주석
       const response = await apiRequest.get(`/usage/${equipmentId}`, {
         headers: {
           Cookie: `testauth=${authToken}`, // 쿠키 포함
         },
-      });
+      }); 
       const equipmentData = {
         name: "Lat Pull Down",
         peopleWaiting: response.data.queue.length,
@@ -36,6 +37,14 @@ const EquipmentInformation = () => {
         target: "Latissimus dorsi",
         status: response.data.queue.length ? true : response.data.status, // true: not available, false: available
         tutorialVideo: true,
+
+        // 서버 연결 안할 때 아래 꺼로
+        // name: "Lat Pull Down",
+        // peopleWaiting: 3,
+        // expectedAvailableTime: 3 * 7,
+        // target: "Latissimus dorsi",
+        // status: false, // true: not available, false: available
+        // tutorialVideo: true,
       };
 
       const recommendedData = [
@@ -137,7 +146,7 @@ const EquipmentInformation = () => {
       </View>
 
       {/* 예약 버튼 */}
-      <TouchableOpacity style={styles.reserveButton}>
+      <TouchableOpacity style={styles.reserveButton} onPress={() => router.push("/(tabs)/reservations")}>
         <Text style={styles.reserveButtonText}>Request Reservation (2/3)</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -260,3 +269,5 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
+

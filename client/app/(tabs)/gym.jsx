@@ -1,6 +1,8 @@
 import { Link } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, View, ScrollView, Dimensions } from "react-native";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import { Ionicons } from "@expo/vector-icons";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
@@ -53,7 +55,15 @@ const getColorBasedOnWaitTime = (waitTime) => {
 const GymLayout = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Silloe Gym</Text>
+      <View style={styles.headerContainer}>
+        <Link href="/gymsearch">
+          <IconSymbol size={28} name="house.fill" color="white"/>
+        </Link>
+        <Text style={styles.header}>Silloe Gym</Text>
+        <Link href="/profile">
+          <Ionicons name="person" size={24} color="white"/>
+        </Link>
+      </View> 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContainer} horizontal>
         <ScrollView contentContainerStyle={styles.gymContent}>
           <View style={[styles.gymContainer, { width: gymWidth, height: gymHeight }]}>
@@ -89,16 +99,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#333333", // 어두운 배경
-    alignItems: "center",
+    alignItems: "left",
     justifyContent: "flex-start",
     padding: 10,
-    paddingTop: 30,
+    paddingTop: 40,
+  },
+  headerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+    justifyContent: "space-between",
   },
   header: {
     fontSize: 24,
     fontWeight: "bold",
     color: "#FFFFFF", // 흰색 텍스트
-    marginBottom: 20,
+    marginBottom: 10,
   },
   scrollView: {
     flex: 1,

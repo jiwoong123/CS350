@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import { View, Text, Button, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
+// import * as Font from "expo-font";
+
 
 const IndexPage = () => {
   const router = useRouter();
@@ -12,24 +14,34 @@ const IndexPage = () => {
       if (token) {
         router.push("/(tabs)/gym"); // 이미 로그인 상태면 Gym 페이지로 이동
       }
+      // router.push("/(tabs)/gym") // login 없이
     };
 
     checkAuth();
   }, []);
 
+  // const loadFonts = async () => {
+  //   await Font.loadAsync({
+  //     "CustomFont": require("../assets/fonts/design-design-700.ttf"), // 폰트 경로
+  //   });
+  // };
+  // loadFonts();
+ 
   const handleLogin = () => {
     router.push("/auth/login");
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to Gym Reservation App</Text>
-      <Text style={styles.subtitle}>Your go-to app for managing gym equipment reservations.</Text>
+      <Text style={styles.title}>Gym RaTs</Text>
+      <Text style={styles.subtitle}>Reserve your routine</Text>
 
       <Button title="Login" onPress={handleLogin} color="#6200ea" />
     </View>
   );
 };
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -40,13 +52,14 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 28,
+    fontSize: 42,
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
+    // fontFamily: "CustomFont",
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 24,
     color: "#666",
     marginBottom: 30,
     textAlign: "center",
@@ -54,3 +67,4 @@ const styles = StyleSheet.create({
 });
 
 export default IndexPage;
+
